@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Test Page</title>
+</head>
+<body>
+{% load static %}
+    <p>
+        <a href="/admin">管理界面</a>
+        <a href="/login/user_logout">退出登录</a>
+        <a href="./folder">文件夹</a>
+    </p>
+    <h1>Hello world</h1>
+    <div>
+        <form action="/netdisk/upload_file/" method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <input type="file" name="files">
+            <input type="submit" value="上传文件">
+        </form>
+    </div>
+
+    <img src="media/test.jpg" height="480" width="270" alt="img">
+    <div>
+         <video width="1920" height="1080" controls="controls">
+        This is a video
+        <source src="media/VID_20200302_202503.mp4" type="video/mp4"/>
+        您的浏览器不支持 video 标签。
+        </video>
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>文件列表</title>
+    <style type="text/css">a {text-decoration: none}</style>
+</head>
+<body>
+    <div>
+        <a href="/netdisk/back">返回上一级</a>
+    </div>
+    <div>
+        <form action="/netdisk/create/" method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+        <label>
+            新建文件夹：
+            <input type="text" id="folder_name" name="folder_name">
+        </label>
+        <input type="submit" value="新建" style="font-size: 18px">
+        </form>
+    </div>
+
+    <div>
+        <p>文件夹</p>
+        {% for folder in folders %}
+            <p>
+                <a href="/netdisk/folder/{{ folder.folder_path }}">{{ folder.folder_name }}</a>
+                <a href="/netdisk/delete/{{ folder.folder_path }}">删除文件夹</a>
+            </p>
+        {% endfor %}
+        <p>文件</p>
+        {% for file in files %}
+            <p>
+                <a href="/netdisk/folder/{{ file.filename }}">{{ file.filename }}</a>
+                <a href="/netdisk/delete/{{ file.filename }}">删除文件</a>
+            </p>
+        {% endfor %}
+    </div>
+</body>
+</html>

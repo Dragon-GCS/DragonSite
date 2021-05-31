@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>跳转界面</title>
+</head>
+<body>
+    <p>{{ message }},<span id="sp">2</span>秒后返回......</p>
+    <script>
+        onload=function () {setInterval(go,1000)};
+        var x=1;
+        function go() {
+            if (x>=0){
+                document.getElementById("sp").innerText=x;}
+            else {
+                location.href="/netdisk/home";}
+            x--;}
+    </script>
+</body>
+</html>
