@@ -1,0 +1,4 @@
+@echo off
+cd E:\Project File\Python\07_DeepLearning
+E:
+jupyter notebook

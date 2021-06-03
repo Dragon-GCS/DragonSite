@@ -5,7 +5,7 @@
     <title>跳转界面</title>
 </head>
 <body>
-    <p>{{ message }},<span id="sp">2</span>秒后返回......</p>
+    <p>{{ message }}, <span id="sp">2</span>秒后返回......</p>
     <script>
         onload=function () {setInterval(go,1000)};
         var x=1;
@@ -13,8 +13,12 @@
             if (x>=0){
                 document.getElementById("sp").innerText=x;}
             else {
-                location.href="/netdisk/home";}
+                location.href= "{{ request.META.HTTP_REFERER }}";}
             x--;}
     </script>
+    <a href="{{ request.META.HTTP_REFERER }}">
+         <button> 立即返回 </button>
+    </a>
+
 </body>
 </html>

@@ -15,11 +15,15 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path,include
+from django.shortcuts import redirect
 
+
+def index(request):
+    return redirect('/netdisk')
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('',include('netdisk.urls')),
+    path('',index),
     path('netdisk/', include('netdisk.urls')),
     path('login/',include('login.urls'))
 ]

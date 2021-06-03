@@ -1,11 +1,11 @@
 # Create your views here.
-from django.shortcuts import render,redirect
-from django.db.utils import IntegrityError
+from django.shortcuts import render,redirect,get_object_or_404
 from django.http import HttpResponse
-from .models import File,Folder
-from django.conf import settings
-import os, re
+from .models import File, Folder, Link
+from django.utils.http import urlunquote
+import os
 from django.contrib.auth.decorators import login_required
+from .utils import handle_upload_files, get_unique_folder_name
 
 
 
@@ -14,66 +14,70 @@ def index(request):
     return render(request, 'netdisk/test.html')
 
 @login_required
-def upload_file(request):
-    request.session['page_from'] = request.META.get('HTTP_REFERER','/')
-    print(request.session['page_from'])
-    if request.method == 'POST':
-        files = request.FILES.getlist("files")
-        path =request.POST.get('path')
-        parent = request.POST.get('parent')
-        if not files:
-            return render(request, 'netdisk/pageJump.html', {'message':'请选择文件'})
-        else:
-            for content in files:
-                f_name = content.name
-                save_path = os.path.join(settings.MEDIA_ROOT,parent,path)
-                print(save_path)
-                folder = Folder(folder_path=os.path.join(parent,path),folder_name=path,parent_folder_name=parent)
-                if not os.path.exists(save_path):
-                    os.makedirs(save_path)
-                    folder.save()
+def upload(request, path):
+    files = request.FILES.getlist("files")
+    parent = get_object_or_404(Folder, path=path)
+    if not files:
+        return render(request, 'netdisk/pageJump.html', {'message':'请选择文件'})
+    else:
+        handle_upload_files(files, parent)
+        return render(request, 'netdisk/pageJump.html', {'message':'上传成功'})
 
+@login_required
+def download(request, path):
+    name = os.path.basename(path)
+    dir = os.path.dirname(path)
+    file = get_object_or_404(File, name=name, dir__path=dir)
+    content = open(file.get_file_path(), 'rb')
+    response = HttpResponse(content)
+    response["Content-Length"] = file.size
+    response['Content-Type'] = 'application/octet-stream'
+    response['Content-Disposition'] = f'attachment;filename="{name}"'
+    return response
 
-                folder = Folder.objects.get(folder_path=os.path.join(parent,path))
-                file = File(filename=f_name,file_path=folder)
-                if not File.objects.filter(filename=f_name,file_path__folder_path=folder.folder_path):
-                    with open(os.path.join(save_path,f_name),'wb+') as f:
-                        for chunks in content.chunks():
-                            f.write(chunks)
-                    file.save()
-
-            return render(request, 'netdisk/pageJump.html', {'message':'上传成功'})
-    return render(request, 'netdisk/upload.html')#redirect(request.session['page_from'])
-
+@login_required
 def folder_show(request, path):
-    path = path.strip('/')
+    path = urlunquote(path.strip('/'))
     if path == "":
         return redirect("/netdisk/folder/root")
-    folder = Folder.objects.filter(parent=path)
-    files = File.objects.filter(dir__path=path)
-    if not Folder.objects.filter(path=path):
-        return HttpResponse(path + '文件夹不存在')
-    return render(request, 'netdisk/folder.html', {'folders':folder, 'files':files})
 
-def create_folder(request):
-    request.session['page_from'] = request.META.get('HTTP_REFERER')
-    if request.method == 'POST':
-        parent_folder_path = re.sub(r'.*/netdisk/folder/','',request.session['page_from'])
-        folder_name = request.POST.get('folder_name')
-        folder_path = '/'.join([parent_folder_path, folder_name])
-        parent = Folder.objects.get(path=parent_folder_path)
-        try:
-            Folder.objects.create(name=folder_name, path=folder_path,parent=parent)
-            return redirect('/netdisk/folder/'+parent_folder_path)
-        except IntegrityError:
-            return HttpResponse('File already exists')
+    basedir = get_object_or_404(Folder, path=path)
+    folder = Folder.objects.filter(parent=basedir.path)
+    files = File.objects.filter(dir=basedir)
+    context = {'folders': folder, 'files': files, 'path':path}
+    return render(request, "netdisk/folder.html", context)
 
-def delete_folder(request,path):
-    obj = Folder.objects.get(folder_path=path)
-    obj.delete()
-    return redirect(request.META.get('HTTP_REFERER'))
+@login_required
+def create(request,path):
+    parent = get_object_or_404(Folder,path=path)
+    name = request.POST.get("folder_name")
+    if not name:
+        return HttpResponse("文件夹名称不能为空")
+    folder_list = Folder.objects.filter(parent=parent)
+    unique_name = get_unique_folder_name(name, folder_list)
+    path = "/".join([path, unique_name])
+    Folder.objects.create(name=unique_name, path=path, parent=parent)
+    return redirect('/netdisk/folder/' + parent.path)
 
-def back_folder(request):
-    path = request.META.get('HTTP_REFERER').split('/')
-    back_path = '/'.join(path[:-1])
+
+@login_required
+def delete(request, type, path):
+    if type =='folder':
+        obj = Folder.objects.get(path=path)
+        obj.remove()    # 删除文件夹及其所有子文件夹与文件
+        message = "文件夹：{}删除成功".format(path)
+
+    elif type == 'file':
+        name = os.path.basename(path)
+        dir = os.path.dirname(path)
+        file = get_object_or_404(File, name=name,dir__path=dir)
+        # 使用Link.minus_link删除一条连接以对应的一条文件数据
+        Link.minus_link(file)
+        message = "文件：{} 删除成功".format(name)
+    return render(request, 'netdisk/pageJump.html', {'message':message})
+
+
+@login_required
+def prev_folder(request):
+    back_path = os.path.dirname(request.META.get('HTTP_REFERER'))
     return redirect(back_path)

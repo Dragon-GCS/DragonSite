@@ -64,8 +64,8 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
-
-                'django.template.context_processors.media'  #模板中可以使用{{ MEDIA_URL }}
+                'django.template.context_processors.request',   #模板中可以使用request
+                'django.template.context_processors.media'      #模板中可以使用{{ MEDIA_URL }}
             ],
         },
     },
@@ -117,7 +117,6 @@ USE_L10N = True
 USE_TZ = True
 
 LOGIN_URL = '/login/user_login/'
-MAIN_PAGE = '/netdisk/'
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
 

@@ -7,10 +7,12 @@
 </head>
 <body>
     <div>
-        <a href="/netdisk/back">返回上一级</a>
+        当前目录{{ path }}<br>
+        <a href={% url "netdisk:prev_folder" %}>返回上一级</a>
     </div>
+    <p></p>
     <div>
-        <form action="/netdisk/create/" method="post" enctype="multipart/form-data">
+        <form action={% url "netdisk:create" path=path %} method="post" enctype="multipart/form-data">
             {% csrf_token %}
         <label>
             新建文件夹：
@@ -19,20 +21,29 @@
         <input type="submit" value="新建" style="font-size: 18px">
         </form>
     </div>
+    <div>
+        <h3>选择文件并上传</h3>
+            <form action={% url "netdisk:upload" path=path %} method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <input type="file" name="files" multiple="multiple" style="font-size: 18px">
+                <input type="submit" value="上传文件" style="font-size: 18px">
+            </form>
 
+    </div>
     <div>
         <p>文件夹</p>
         {% for folder in folders %}
             <p>
-                <a href="/netdisk/folder/{{ folder.folder_path }}">{{ folder.folder_name }}</a>
-                <a href="/netdisk/delete/{{ folder.folder_path }}">删除文件夹</a>
+                <a href={% url "netdisk:folder_show" path=folder.path %}>{{ folder.name }}</a>
+                <a href={% url "netdisk:delete" type="folder" path=folder.path %}>删除文件夹</a>
             </p>
         {% endfor %}
         <p>文件</p>
         {% for file in files %}
             <p>
-                <a href="/netdisk/folder/{{ file.filename }}">{{ file.filename }}</a>
-                <a href="/netdisk/delete/{{ file.filename }}">删除文件</a>
+                {{ file.name }}
+                <a href={% url "netdisk:download" path=file.get_url_path%}>下载</a>
+                <a href={% url "netdisk:delete" type="file" path=file.get_url_path%}>删除文件</a>
             </p>
         {% endfor %}
     </div>
