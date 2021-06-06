@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    {% block title %}
+        <title>Base Template</title>
+    {% endblock %}
+    {% load static %}
+    <link rel="stylesheet" type="text/css" href="{% static 'netdisk/css/base.css' %}">
+</head>
+<body>
+    <header class="head">
+        <div class="head-logo"><a href="/" class="head-logo"><b>DragonSite</b></a></div>
+        <div class="user-login">
+            {% if request.user.is_authenticated %}
+                <p class="user-login">欢迎您，{{ request.user }}</p>
+                <a href="/admin">管理界面</a>
+                <a href="/login/user_logout">退出登录</a>
+            {% endif %}
+        </div>
+    </header>
+
+    <div class="sidebar">
+        <div class="folder-sorted">
+            <a href={% url "netdisk:folder_show" path='root' %} class="folder-sorted">所有文件</a>
+        </div>
+    </div>
+
+    <div class="content-core">
+        {% block content-core %}
+            <div style="display:flex; justify-content:center; align-items:center;height: 100%">
+                <h1 style="color:rgba(0,0,0,0.1)"> Welcome DragonSite</h1>
+            </div>
+        {% endblock %}
+    </div>
+
+    <footer class="footer">
+       <ul class="information">
+           <li class="information">
+               <a href="https://github.com/dragon-GCS/">
+                   <img src="{% static 'netdisk/image/github.webp' %}" height="20px">Github仓库
+               </a>
+           </li>|
+           <li class="information">联系方式：zhangzelong1001@foxmail.com</li>
+       </ul>
+    </footer>
+</body>
+</html>

@@ -11,7 +11,7 @@ from .utils import handle_upload_files, get_unique_folder_name
 
 @login_required
 def index(request):
-    return render(request, 'netdisk/test.html')
+    return render(request, 'netdisk/base.html')
 
 @login_required
 def upload(request, path):

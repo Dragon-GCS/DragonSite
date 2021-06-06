@@ -1,11 +1,8 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>文件列表</title>
-    <style type="text/css">a {text-decoration: none}</style>
-</head>
-<body>
+{% extends "netdisk/base.html" %}
+{% block title %}
+    <title>DragonSite</title>
+{% endblock %}
+{% block content-core %}
     <div>
         当前目录{{ path }}<br>
         <a href={% url "netdisk:prev_folder" %}>返回上一级</a>
@@ -47,5 +44,4 @@
             </p>
         {% endfor %}
     </div>
-</body>
-</html>
+{% endblock %}

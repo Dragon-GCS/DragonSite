@@ -1,14 +1,10 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>登录</title>
-</head>
-<body>
-     <div style="margin: 15% 40%;">
+{% extends "netdisk/base.html" %}
+{% block title %}登录界面{% endblock %}
+{% block content-core %}
+    <div style="margin: 15% 40%;">
         <h1>欢迎登录！</h1>
-       <form action="/login/user_login/" method="post">
-           {% csrf_token %}
+        <form action="/login/user_login/" method="post">
+            {% csrf_token %}
             <p>
                 <label for="id_username">用户名：</label>
                 <input type="text" id="id_username" name="username" placeholder="用户名" required />
@@ -21,8 +17,5 @@
             <input type="submit" value="确定">
         </form>
     </div>
+{% endblock %}
 
-
-
-</body>
-</html>
