@@ -1,47 +1,98 @@
 {% extends "netdisk/base.html" %}
+
 {% block title %}
     <title>DragonSite</title>
+    {% load static %}
+    <link rel="stylesheet" type="text/css" href="{% static 'netdisk/css/folder.css' %}">
+    <script src="{% static "netdisk/js/jquery-3.6.0.min.js" %}"></script>
+    <script src="{% static "netdisk/js/folder.js" %}"></script>
 {% endblock %}
+
 {% block content-core %}
-    <div>
-        当前目录{{ path }}<br>
-        <a href={% url "netdisk:prev_folder" %}>返回上一级</a>
-    </div>
-    <p></p>
-    <div>
-        <form action={% url "netdisk:create" path=path %} method="post" enctype="multipart/form-data">
+    <div class="folder-menu">
+        <div>
+            <button id="go_back" class="folder-button">返回上一级</button>
+            <button id="create" class="folder-button">新建文件夹</button>
+            <button id="upload" class="folder-button">上传文件</button>
+        </div>
+        <div id="path-nav">
+            当前目录:
+            {% for item in path_link %}
+                <a href= {% url "netdisk:folder_show" path=item|last %}>{{ item|first }}</a>
+            {% endfor %}
+        </div>
+
+        <!--文件提交表单-->
+        <form action={% url "netdisk:upload" path=path %} method="post" enctype="multipart/form-data" id="upload_form">
             {% csrf_token %}
-        <label>
-            新建文件夹：
-            <input type="text" id="folder_name" name="folder_name">
-        </label>
-        <input type="submit" value="新建" style="font-size: 18px">
+            <input type="file" name="files" id="file_upload" multiple="multiple" style="display:none">
         </form>
     </div>
-    <div>
-        <h3>选择文件并上传</h3>
-            <form action={% url "netdisk:upload" path=path %} method="post" enctype="multipart/form-data">
-                {% csrf_token %}
-                <input type="file" name="files" multiple="multiple" style="font-size: 18px">
-                <input type="submit" value="上传文件" style="font-size: 18px">
-            </form>
 
-    </div>
-    <div>
-        <p>文件夹</p>
+    <div class="folder-container">
+        <!--文件夹展示-->
         {% for folder in folders %}
-            <p>
-                <a href={% url "netdisk:folder_show" path=folder.path %}>{{ folder.name }}</a>
-                <a href={% url "netdisk:delete" type="folder" path=folder.path %}>删除文件夹</a>
-            </p>
+            <div class="folder-detail">
+                <a class="name" href= {% url "netdisk:folder_show" path=folder.path %}>
+                    <div class="item-icon">
+                        <img src="{% static 'netdisk/image/folder.png' %}" alt="image" width="100px" height="100px">
+                    </div>
+                    <div class="name">{{ folder.show_name }}</div>
+                </a>
+                <div class="hidden-option">
+                    <p class="del-url" style="display:none">{% url "netdisk:delete" type="folder" path=folder.path %}</p >
+                    <button class="rename-button">重命名</button>
+                    <button class="del-button">删除</button>
+                </div>
+                <!--重命名表单-->
+                <form action={% url "netdisk:rename" type="folder" path=folder.path %} method="post" enctype="multipart/form-data" class="rename-form" style="display:none">
+                    {% csrf_token %}
+                    <input type="text" name="new_name" placeholder="重命名" autocomplete="off">
+                    <p></p >
+                    <input type="submit" class="folder-button" value="确定">
+                    <input type="button" class="folder-button" value="取消">
+                </form>
+            </div>
         {% endfor %}
-        <p>文件</p>
+
+        <!--新建文件夹表单-->
+        <div id="folder_input">
+            <form action={% url "netdisk:create" path=path %} method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <input type="text" id="folder_name" name="folder_name" placeholder="文件夹名称" autocomplete="off">
+                <p></p>
+                <input type="submit" class="folder-button" value="确定"></input>
+                <input type="button" id="cancel-create" class="folder-button" value="取消"></input>
+            </form>
+        </div>
+        <!--文件展示-->
         {% for file in files %}
-            <p>
-                {{ file.name }}
-                <a href={% url "netdisk:download" path=file.get_url_path%}>下载</a>
-                <a href={% url "netdisk:delete" type="file" path=file.get_url_path%}>删除文件</a>
-            </p>
+             <div class="folder-detail">
+                 <a class="name" href= {% url "netdisk:download" path=file.get_url_path%}>
+                     <div class="item-icon">
+                         {% if file.is_image %}
+                             <img class="item-icon"src={% url "netdisk:preview" path=file.get_url_path%}  alt="图标">
+                         {% else %}
+                             <img src="{% static 'netdisk/image/file.png' %}" alt="图标" width="100px" height="100px">
+                         {% endif %}
+                     </div>
+                     <div class="name">{{ file.show_name }}</div>
+                 </a>
+
+                 <div class="hidden-option">
+                    <p class="del-url" style="display:none">{% url "netdisk:delete" type="file" path=file.get_url_path %}</p >
+                    <button class="rename-button">重命名</button>
+                    <button class="del-button">删除</button>
+                 </div>
+                <!--重命名表单-->
+                 <form action={% url "netdisk:rename" type="file" path=file.get_url_path %} method="POST" enctype="multipart/form-data" class="rename-form" style="display:none">
+                    {% csrf_token %}
+                    <input type="text" name="new_name" placeholder="重命名" autocomplete="off">
+                    <p></p >
+                    <input type="submit" class="folder-button" value="确定">
+                    <input type="button" class="folder-button" value="取消">
+                 </form>
+             </div>
         {% endfor %}
     </div>
 {% endblock %}

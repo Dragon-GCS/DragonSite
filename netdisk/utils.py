@@ -54,3 +54,10 @@ def get_unique_file_name(name, content_list):
             cont += 1
         name = f'{prefix}({cont}){suffix}'
     return name
+
+def path_to_link(path):
+    path_link = [("root","root")]
+    path = path.strip("/").split("/")
+    if len(path) > 1:
+        path_link += [('/' + path[i], '/'.join([path[i - 1], path[i]])) for i in range(1, len(path))]
+    return path_link

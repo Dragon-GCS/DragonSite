@@ -1,7 +1,19 @@
 {% extends "netdisk/base.html" %}
-{% block title %}跳转界面{% endblock %}
+
+{% block title %}
+    <title>跳转界面</title>
+    {% load static %}
+    <link rel="stylesheet" type="text/css" href="{% static 'netdisk/css/pageJump.css.css' %}">
+{% endblock %}
+
 {% block content-core %}
-    <p>{{ message }}, <span id="sp">2</span>秒后返回......</p>
+    <div style="width: 100%;height: 100%">
+    <p >{{ message }}, <span id="sp">2</span>秒后返回......</p>
+    <a href="{{ request.META.HTTP_REFERER }}">
+         <button> 立即返回 </button>
+    </a>
+    </div>
+
     <script>
         onload=function () {setInterval(go,1000)};
         var x=1;
@@ -12,7 +24,5 @@
                 location.href= "{{ request.META.HTTP_REFERER }}";}
             x--;}
     </script>
-    <a href="{{ request.META.HTTP_REFERER }}">
-         <button> 立即返回 </button>
-    </a>
+
 {% endblock %}

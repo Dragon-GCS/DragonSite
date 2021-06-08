@@ -1,9 +1,8 @@
 from django.db import models
 from django.conf import settings
 #from django.contrib.auth.models import User
+import os, filetype
 
-import os
-# Create your models here.
 
 MEDIA_ROOT = settings.MEDIA_ROOT
 
@@ -16,16 +15,28 @@ class File(models.Model):
     upload_time = models.DateField(auto_now_add=True)
 
     def __str__(self):
-        return self.name
+        return self.get_url_path()
 
+    def show_name(self):
+        filename, suffix = os.path.splitext(self.name)
+        if len(filename) > 10:
+            return f"{filename[:10]}…{suffix}"
+        return self.name
+        
     def get_url_path(self):
         return '/'.join([self.dir.path, self.name])
+
+    def get_cache_path(self):
+        return os.path.join(MEDIA_ROOT,'cache', self.digest+'.jpg')
 
     def get_file_path(self):
         return os.path.join(MEDIA_ROOT, self.digest)
 
     def remove_file(self):
         os.remove(self.get_file_path())
+
+    def is_image(self):
+        return filetype.image_match(self.get_file_path())
 
     def get_file_size(self):
         size = self.size
@@ -48,6 +59,11 @@ class Folder(models.Model):
 
     def __str__(self):
         return self.path
+
+    def show_name(self):
+        if len(self.name) > 10:
+            return self.name[:10]
+        return self.name
 
     @classmethod
     def create_root(cls):
