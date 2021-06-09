@@ -3,15 +3,23 @@
 # Created at 2021/5/8 21:50
 # Edit with PyCharm
 
-import hashlib, uuid, os, shutil
+import hashlib
+import os
+import shutil
+import uuid
+
 from django.conf import settings
+
 from .models import File, Link
-MEDIA_ROOT = settings.MEDIA_ROOT
+
+MEDIA_ROOT = os.path.join(settings.BASE_DIR,'netdisk','media')
 
 
-def handle_upload_files(files, parent):
+def handle_upload_files(files, parent, owner=None):
     #MD5计算速度比sha1快
-    file_list = File.objects.filter(dir=parent)
+    file_list = File.objects.filter(dir=parent,owner=owner)
+    if not os.path.isdir(MEDIA_ROOT):
+        os.mkdir(MEDIA_ROOT)
     for file in files:
         digest = hashlib.md5()
         unique_name = get_unique_file_name(file.name, file_list)
@@ -27,6 +35,7 @@ def handle_upload_files(files, parent):
         file_path = os.path.join(MEDIA_ROOT, digest)
         file = File.objects.create(name=unique_name,
                                    dir=parent,
+                                   owner=owner,
                                    digest=digest,
                                    size=file.size)
         Link.add_link(file)     #增加对应的链接
@@ -56,8 +65,8 @@ def get_unique_file_name(name, content_list):
     return name
 
 def path_to_link(path):
-    path_link = [("root","root")]
     path = path.strip("/").split("/")
+    path_link = [(path[0], path[0])]
     if len(path) > 1:
         path_link += [('/' + path[i], '/'.join([path[i - 1], path[i]])) for i in range(1, len(path))]
     return path_link

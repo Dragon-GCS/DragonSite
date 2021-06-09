@@ -1,3 +1,5 @@
-__pycache__/
-*__pycache__/
+__pycache/
+*/__pycache__/
+*/*/__pycache__/
 .idea/
+*/mirations/*_*.py

@@ -1,14 +1,15 @@
-from django.db import models
+import filetype
+import os
+
 from django.conf import settings
-#from django.contrib.auth.models import User
-import os, filetype
+from django.contrib.auth.models import User
+from django.db import models
 
-
-MEDIA_ROOT = settings.MEDIA_ROOT
+MEDIA_ROOT = os.path.join(settings.BASE_DIR,'netdisk','media')
 
 class File(models.Model):
     name = models.CharField('文件名',max_length=256)
-    #owner = models.ForeignKey(User, on_delete=models.DO_NOTHING)
+    owner = models.ForeignKey(User, on_delete=models.DO_NOTHING,null=True,default=None)
     dir = models.ForeignKey('Folder', on_delete=models.CASCADE, null=False)
     digest = models.CharField(max_length=32)
     size = models.IntegerField(default=0)
@@ -27,7 +28,7 @@ class File(models.Model):
         return '/'.join([self.dir.path, self.name])
 
     def get_cache_path(self):
-        return os.path.join(MEDIA_ROOT,'cache', self.digest+'.jpg')
+        return os.path.join(settings.CACHE_PATH, self.digest + settings.IMAGE_CACHE_TYPE)
 
     def get_file_path(self):
         return os.path.join(MEDIA_ROOT, self.digest)
@@ -53,8 +54,9 @@ class File(models.Model):
 
 class Folder(models.Model):
     name = models.CharField('文件夹名称', max_length=32)
-    path = models.CharField('文件夹路径', unique=True, max_length=2048)
-    parent = models.ForeignKey('Folder',to_field='path',null=True,on_delete=models.CASCADE)
+    path = models.CharField('文件夹路径', max_length=2048)
+    parent = models.ForeignKey('Folder',null=True,on_delete=models.CASCADE)
+    owner = models.ForeignKey(User, on_delete=models.DO_NOTHING, null=True, default=None)
     creat_time = models.DateField(auto_now_add=True)
 
     def __str__(self):
@@ -66,12 +68,17 @@ class Folder(models.Model):
         return self.name
 
     @classmethod
-    def create_root(cls):
-        if not cls.objects.filter(path='root'):
-            return cls.objects.create(name='root',path='root',parent=None)
+    def create_root(cls, owner):
+        if not cls.objects.filter(path='root', owner=owner):
+            cls.objects.create(name='root', path='root', parent=None, owner=owner)
+
+    @classmethod
+    def create_public(cls):
+        if not cls.objects.filter(path='public'):
+            cls.objects.create(name='public', path='public', parent=None)
 
     def remove(self):
-        for subdir in Folder.objects.filter(parent=self.path):
+        for subdir in Folder.objects.filter(parent=self,owner=self.owner):
             for file in subdir.file_set.all():
                 Link.minus_link(file)
 

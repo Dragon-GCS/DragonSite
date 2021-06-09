@@ -1,13 +1,13 @@
 # coding = utf-8
 # Dragon's Python3.8 code
-# Created at 2021/5/6 19:49
+# Created at 2021/6/9 20:02
 # Edit with PyCharm
 
 from django.urls import re_path
 
 from . import views
 
-app_name = 'netdisk'
+app_name = 'publicdisk'
 urlpatterns = [
     re_path(r'^$', views.index, name='index'),
     re_path(r'back/$', views.prev_folder, name='prev_folder'),
@@ -19,4 +19,3 @@ urlpatterns = [
     re_path(r'^delete/(?P<type>(file|folder))&(?P<path>([\S]+/?)*)$', views.delete, name='delete'),
     re_path(r'^rename/(?P<type>(file|folder))&(?P<path>([\S]+/?)*)$', views.rename, name='rename'),
 ]
-

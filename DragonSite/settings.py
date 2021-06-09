@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'netdisk',
+    'publicdisk',
     'login',
 ]
 
@@ -84,6 +85,7 @@ DATABASES = {
     }
 }
 
+DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
 
 # Password validation
 # https://docs.djangoproject.com/en/3.1/ref/settings/#auth-password-validators
@@ -121,7 +123,13 @@ LOGIN_URL = '/login/user_login/'
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
 
 STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR,'static')
+
 MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR,'netdisk','media')
+MEDIA_ROOT = os.path.join(BASE_DIR,'media')
+
 SESSION_COOKIE_AGE = 24*60*60   # 登录有效时间-秒
 SESSION_EXPIRE_AT_BROWSER_CLOSE = False # 关闭浏览器时登录失效
+
+CACHE_PATH = os.path.join(BASE_DIR,'netdisk','media', 'cache')
+IMAGE_CACHE_TYPE = '.jpg'

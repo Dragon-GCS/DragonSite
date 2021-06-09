@@ -4,6 +4,7 @@
 # Edit with PyCharm
 
 from django.urls import path
+
 from . import views
 
 urlpatterns = [

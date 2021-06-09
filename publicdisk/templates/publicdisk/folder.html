@@ -1,30 +1,30 @@
-{% extends "netdisk/base.html" %}
+{% extends "publicdisk/base.html" %}
 
 {% block title %}
     <title>DragonSite</title>
     {% load static %}
-    <link rel="stylesheet" type="text/css" href="{% static 'netdisk/css/folder.css' %}">
-    <script src="{% static "netdisk/js/jquery-3.6.0.min.js" %}"></script>
-    <script src="{% static "netdisk/js/folder.js" %}"></script>
+    <link rel="stylesheet" type="text/css" href="{% static 'publicdisk/css/folder.css' %}">
+    <script src="{% static "publicdisk/js/jquery-3.6.0.min.js" %}"></script>
+    <script src="{% static "publicdisk/js/folder.js" %}"></script>
 {% endblock %}
 
 {% block content-core %}
     <div class="folder-menu">
         <div>
             <button id="back-button" class="folder-button">返回上一级</button>
-            <span id="goback" style="display:none">{% url "netdisk:prev_folder" %}</span>
+            <span id="goback" style="display:none">{% url "publicdisk:prev_folder" %}</span>
             <button id="create" class="folder-button">新建文件夹</button>
             <button id="upload" class="folder-button">上传文件</button>
         </div>
         <div id="path-nav">
             当前目录:
             {% for item in path_link %}
-                <a href= {% url "netdisk:folder_show" path=item|last %}>{{ item|first }}</a>
+                <a href= {% url "publicdisk:folder_show" path=item|last %}>{{ item|first }}</a>
             {% endfor %}
         </div>
 
         <!--文件上传表单-->
-        <form action={% url "netdisk:upload" path=path %} method="post" enctype="multipart/form-data" id="upload_form">
+        <form action={% url "publicdisk:upload" path=path %} method="post" enctype="multipart/form-data" id="upload_form">
             {% csrf_token %}
             <input type="file" name="files" id="file_upload" multiple="multiple" style="display:none">
         </form>
@@ -34,19 +34,19 @@
         <!--文件夹展示-->
         {% for folder in folders %}
             <div class="folder-detail">
-                <a class="name" href= {% url "netdisk:folder_show" path=folder.path %}>
+                <a class="name" href= {% url "publicdisk:folder_show" path=folder.path %}>
                     <div class="item-icon">
-                        <img src="{% static 'netdisk/image/folder.png' %}" alt="image" width="100px" height="100px">
+                        <img src="{% static 'publicdisk/image/folder.png' %}" alt="image" width="100px" height="100px">
                     </div>
                     <div class="name">{{ folder.show_name }}</div>
                 </a>
                 <div class="hidden-option">
-                    <p class="del-url" style="display:none">{% url "netdisk:delete" type="folder" path=folder.path %}</p >
+                    <p class="del-url" style="display:none">{% url "publicdisk:delete" type="folder" path=folder.path %}</p >
                     <button class="rename-button">重命名</button>
                     <button class="del-button">删除</button>
                 </div>
                 <!--重命名表单-->
-                <form action={% url "netdisk:rename" type="folder" path=folder.path %} method="post" enctype="multipart/form-data" class="rename-form" style="display:none">
+                <form action={% url "publicdisk:rename" type="folder" path=folder.path %} method="post" enctype="multipart/form-data" class="rename-form" style="display:none">
                     {% csrf_token %}
                     <input type="text" name="new_name" placeholder="重命名" autocomplete="off">
                     <p></p >
@@ -58,7 +58,7 @@
 
         <!--新建文件夹表单-->
         <div id="folder_input">
-            <form action={% url "netdisk:create" path=path %} method="post" enctype="multipart/form-data" id="create-form">
+            <form action={% url "publicdisk:create" path=path %} method="post" enctype="multipart/form-data" id="create-form">
                 {% csrf_token %}
                 <input type="text" id="folder_name" name="folder_name" placeholder="文件夹名称" autocomplete="off">
                 <p></p>
@@ -69,24 +69,24 @@
         <!--文件展示-->
         {% for file in files %}
              <div class="folder-detail">
-                 <a class="name" href= {% url "netdisk:download" path=file.get_url_path%}>
+                 <a class="name" href= {% url "publicdisk:download" path=file.get_url_path%}>
                      <div class="item-icon">
                          {% if file.is_image %}
-                             <img class="item-icon"src={% url "netdisk:preview" path=file.get_url_path%}  alt="图标">
+                             <img class="item-icon"src={% url "publicdisk:preview" path=file.get_url_path%}  alt="图标">
                          {% else %}
-                             <img src="{% static 'netdisk/image/file.png' %}" alt="图标" width="100px" height="100px">
+                             <img src="{% static 'publicdisk/image/file.png' %}" alt="图标" width="100px" height="100px">
                          {% endif %}
                      </div>
                      <div class="name">{{ file.show_name }}</div>
                  </a>
 
                  <div class="hidden-option">
-                    <p class="del-url" style="display:none">{% url "netdisk:delete" type="file" path=file.get_url_path %}</p >
+                    <p class="del-url" style="display:none">{% url "publicdisk:delete" type="file" path=file.get_url_path %}</p >
                     <button class="rename-button">重命名</button>
                     <button class="del-button">删除</button>
                  </div>
                 <!--重命名表单-->
-                 <form action={% url "netdisk:rename" type="file" path=file.get_url_path %} method="POST" enctype="multipart/form-data" class="rename-form" style="display:none">
+                 <form action={% url "publicdisk:rename" type="file" path=file.get_url_path %} method="POST" enctype="multipart/form-data" class="rename-form" style="display:none">
                     {% csrf_token %}
                     <input type="text" name="new_name" placeholder="重命名" autocomplete="off">
                     <p></p >
