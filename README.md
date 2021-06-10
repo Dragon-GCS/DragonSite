@@ -32,9 +32,10 @@
 ## 安装说明
 
 1.  `pip install -r requirement.txt` 安装所需包
-2.  `python manage.py createsuperuser` 按提示输入用户名，邮箱（随意）和密码（小于8位的密码需再次确认）
-3.  打开`DragonSite/settings`，修改`DEBUG=False`
-4.  `python manage.py collectstatic` 收集所需静态文件至`STATIC_ROOT`
-5.  `python mange.py runserver 0.0.0.0:8000` 即可运行服务（仅个人或小范围时使用此方法进行部署）
+2.  `python manage.py makemigrations netdisk` 和 `python manage.py migrate` 创建模型
+3.  `python manage.py createsuperuser` 按提示输入用户名，邮箱（随意）和密码（小于8位的密码需再次确认）
+4.  打开`DragonSite/settings`，修改`DEBUG=False`
+5.  `python manage.py collectstatic` 收集所需静态文件至`STATIC_ROOT`
+6.  `python mange.py runserver 0.0.0.0:8000` 即可运行服务（仅个人或小范围时使用此方法进行部署）
 
 确认本机ip后，同一局域网下在浏览器中输入`<本机ip>:8000` 即可访问本站。
