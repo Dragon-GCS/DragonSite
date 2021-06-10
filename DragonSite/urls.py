@@ -15,16 +15,26 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.shortcuts import render
-from django.urls import path, include
+from django.urls import path, include, re_path
+from django.views.static import serve
+from django.conf import settings
 
 
 def index(request):
-    return render(request, 'netdisk/base.html')
+    return render(request, 'base.html')
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('',index),
     path('netdisk/', include('netdisk.urls')),
     path('publicdisk/', include('publicdisk.urls')),
-    path('login/',include('login.urls'))
+    path('login/',include('login.urls')),
+    re_path(r'^static/(?P<path>.*)$', serve, {'document_root': settings.STATIC_ROOT}, name='static'),
+    re_path(r'^media/(?P<path>.*)$', serve, {'document_root': settings.MEDIA_ROOT}, name='media'),
 ]
+'''
+urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+仅在DEBUG=TRUE 能够提供静态文件服务
+文档上说上面re_path也仅在DEBUG环境生效，然而并不是
+'''
+

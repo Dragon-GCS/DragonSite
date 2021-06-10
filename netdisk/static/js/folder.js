@@ -1,5 +1,4 @@
 $(function(){
-    image_thumbnail()
     //返回上一级
     $("#back-button").click(function () {
         location.href = $("#goback").text()
@@ -61,45 +60,23 @@ $(function(){
         location.href = url;
         }
     })
-    //图片预览
-    $("a.name").click(function(){
-        var url = $(this).siblings("p.preview-url").text()
-        var img = $(this).children("img")
-        console.log(url)
+    /* 可以从服务器读取字节流
+    $(function () {
+        var img = $(".image-icon")
+        var url = img.attr('src')
         var xmlhttp = new XMLHttpRequest()
-        xmlhttp.open("GET",url,true);
-        xmlhttp.responseType = "blob";
-        xmlhttp.onload = function(){
-            console.log(this);
-            if (this.status == 200) {
-                var blob = this.response;
-                //var img = document.createElement("img");
-                img.onload = function(e) {
-                    window.URL.revokeObjectURL(img.attr("src"));
-                };
-                img.attr("src", window.URL.createObjectURL(blob));
-
+            xmlhttp.open("GET",url,true);
+            xmlhttp.responseType = "blob";
+            xmlhttp.onload = function(){
+                if (this.status == 200) {
+                    var blob = this.response;
+                    //var img = document.createElement("img");
+                    img.onload = function(e) {
+                        window.URL.revokeObjectURL(img.attr("src"));
+                    };
+                    img.attr("src", window.URL.createObjectURL(blob));
+                }
             }
-        }
-        xmlhttp.send();
-    })
+    })*/
 
 })
-
-function image_thumbnail() {
-    var img = $(".image-icon")
-    var url = img.attr('src')
-    var xmlhttp = new XMLHttpRequest()
-        xmlhttp.open("GET",url,true);
-        xmlhttp.responseType = "blob";
-        xmlhttp.onload = function(){
-            if (this.status == 200) {
-                var blob = this.response;
-                //var img = document.createElement("img");
-                img.onload = function(e) {
-                    window.URL.revokeObjectURL(img.attr("src"));
-                };
-                img.attr("src", window.URL.createObjectURL(blob));
-            }
-        }
-}

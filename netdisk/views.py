@@ -1,10 +1,10 @@
 # Create your views here.
-import os
+import os,mimetypes
 
 from PIL import Image
 
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponse
+from django.http import HttpResponse, FileResponse
 from django.shortcuts import render, redirect, get_object_or_404, reverse
 
 from .models import File, Folder, Link
@@ -22,11 +22,8 @@ def upload(request, path):
     if request.method == "POST":
         files = request.FILES.getlist("files")
         parent = get_object_or_404(Folder, path=path, owner=request.user)
-        if not files:
-            return render(request, 'netdisk/pageJump.html', {'message':'请选择文件'})
-        else:
-            handle_upload_files(files, parent, request.user)
-            return render(request, 'netdisk/pageJump.html', {'message':'上传成功'})
+        handle_upload_files(files, parent, request.user)
+        return render(request, 'pageJump.html', {'message':'上传成功'})
 
 @login_required
 def download(request, path):
@@ -34,11 +31,14 @@ def download(request, path):
         name = os.path.basename(path)
         dir = os.path.dirname(path)
         file = get_object_or_404(File, name=name, dir__path=dir,owner=request.user)
-        content = open(file.get_file_path(), 'rb')
-        response = HttpResponse(content)
+        content_type, encoding = mimetypes.guess_type(str(file.get_file_path()))
+        content_type = content_type or 'application/octet-stream'
+        response = FileResponse(open(file.get_file_path(), 'rb'))
         response["Content-Length"] = file.size
-        response['Content-Type'] = 'application/octet-stream'
+        response['Content-Type'] = content_type
         response['Content-Disposition'] = f'attachment;filename="{name}"'
+        if encoding:
+            response["Content-Encoding"] = encoding
         return response
 
 @login_required
@@ -54,9 +54,7 @@ def preview(request,path):
             image = Image.open(file.get_file_path())
             image = image.resize((150,150))
             image.save(cache_path)
-        with open(cache_path,'rb') as f:
-            byte = f.read()
-        return HttpResponse(byte)
+        return FileResponse(open(cache_path,'rb'))
 
 @login_required
 def folder_show(request, path):
@@ -66,7 +64,7 @@ def folder_show(request, path):
         basedir = get_object_or_404(Folder, path=path, owner=request.user)
         folder = Folder.objects.filter(parent=basedir, owner=request.user)
         files = File.objects.filter(dir=basedir, owner=request.user)
-        path_link = path_to_link(path)
+        path_link = path_to_link(basedir)   # 用于直接返回多层目录
         context = {'folders': folder, 'files': files, 'path':path,'path_link':path_link}
         return render(request, "netdisk/folder.html", context)
 
@@ -113,7 +111,7 @@ def rename(request, type, path):
                 file.save()
                 message = "文件：{}重命名为{}".format(name, new_name)
 
-        return render(request, 'netdisk/pageJump.html', {'message':message})
+        return render(request, 'pageJump.html', {'message':message})
 
 @login_required
 def delete(request, type, path):
@@ -129,7 +127,7 @@ def delete(request, type, path):
             # 使用Link.minus_link删除一条连接以对应的一条文件数据
             Link.minus_link(file)
             message = "文件：{} 删除成功".format(name)
-        return render(request, 'netdisk/pageJump.html', {'message':message})
+        return render(request, 'pageJump.html', {'message':message})
 
 
 @login_required
@@ -137,5 +135,3 @@ def prev_folder(request):
     if request.method == 'GET':
         back_path = os.path.dirname(request.META.get('HTTP_REFERER'))
         return redirect(back_path)
-
-

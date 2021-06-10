@@ -23,7 +23,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = '=8gueu-2pm900y3bznejl3!vee$d)i=6&flx3d82j*3bl22=rg'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False # DEBUG=False时需要先运行 manage.py collectstatic
 
 ALLOWED_HOSTS = ['*',]
 
@@ -63,10 +63,9 @@ TEMPLATES = [
             'context_processors': [
                 'django.template.context_processors.debug',
                 'django.template.context_processors.request',
+                'django.template.context_processors.media',      #模板中可以使用{{ MEDIA_URL }}
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
-                'django.template.context_processors.request',   #模板中可以使用request
-                'django.template.context_processors.media'      #模板中可以使用{{ MEDIA_URL }}
             ],
         },
     },
@@ -122,14 +121,14 @@ LOGIN_URL = '/login/user_login/'
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
 
-STATIC_URL = '/static/'
+STATIC_URL = 'static/'
 STATIC_ROOT = os.path.join(BASE_DIR,'static')
 
 MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR,'media')
+MEDIA_ROOT = os.path.join(BASE_DIR,'media') #文件保存位置
 
 SESSION_COOKIE_AGE = 24*60*60   # 登录有效时间-秒
 SESSION_EXPIRE_AT_BROWSER_CLOSE = False # 关闭浏览器时登录失效
 
-CACHE_PATH = os.path.join(BASE_DIR,'netdisk','media', 'cache')
+CACHE_PATH = os.path.join(BASE_DIR, 'media', 'cache')
 IMAGE_CACHE_TYPE = '.jpg'

@@ -2,4 +2,4 @@ __pycache/
 */__pycache__/
 */*/__pycache__/
 .idea/
-*/mirations/*_*.py
+*/migrations/*_*.py

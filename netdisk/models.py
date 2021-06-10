@@ -5,7 +5,7 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.db import models
 
-MEDIA_ROOT = os.path.join(settings.BASE_DIR,'netdisk','media')
+MEDIA_ROOT = os.path.join(settings.MEDIA_ROOT,'netdisk')
 
 class File(models.Model):
     name = models.CharField('文件名',max_length=256)

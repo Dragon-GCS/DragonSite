@@ -3,9 +3,7 @@
 
 业余时间学习的Django框架，写了一个私人网盘。希望能与人交流一下有哪些不足。
 
-因为是个人网盘，所以没有开通用户注册，只能由管理员添加用户。
-
-目前已实现以下功能，
+目前已实现以下功能
 -   [x] 文件上传，文件以md5作为唯一标识，只保存一份文件
 -   [x] 新建文件夹
 -   [x] 文件、文件夹删除
@@ -17,10 +15,26 @@
 后续有时间以及有兴趣的的话会添加以下功能
 * 批量操作
 * 移动
-* 增加文件上传进度显示
 * 在线预览`视频` `图片` `markdown`等文件
 * 简单的博客系统，用于处理文本信息
 * 用类似于`elementUI`这种框架做一个好看点的界面
 
+## 示例图片
 
+`Example1`
 
+<img src="example1.png" style="zoom:70%" alt='example1'>
+
+`Example2`
+
+<img src="example2.png" style="zoom:70%" alt='example1'>
+
+## 安装说明
+
+1.  `pip install -r requirement.txt` 安装所需包
+2.  `python manage.py createsuperuser` 按提示输入用户名，邮箱（随意）和密码（小于8位的密码需再次确认）
+3.  打开`DragonSite/settings`，修改`DEBUG=False`
+4.  `python manage.py collectstatic` 收集所需静态文件至`STATIC_ROOT`
+5.  `python mange.py runserver 0.0.0.0:8000` 即可运行服务（仅个人或小范围时使用此方法进行部署）
+
+确认本机ip后，同一局域网下在浏览器中输入`<本机ip>:8000` 即可访问本站。
