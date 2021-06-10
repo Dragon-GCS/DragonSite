@@ -23,11 +23,11 @@
 
 `Example1`
 
-<img src="example1.png" style="zoom:70%" alt='example1'>
+<img src="example1.png" style="zoom:50%" alt='example1'>
 
 `Example2`
 
-<img src="example2.png" style="zoom:70%" alt='example1'>
+<img src="example2.png" style="zoom:50%" alt='example1'>
 
 ## 安装说明
 
