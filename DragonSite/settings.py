@@ -23,7 +23,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = '=8gueu-2pm900y3bznejl3!vee$d)i=6&flx3d82j*3bl22=rg'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False # DEBUG=False时需要先运行 manage.py collectstatic
+DEBUG = True # DEBUG=False时需要先运行 manage.py collectstatic
 
 ALLOWED_HOSTS = ['*',]
 

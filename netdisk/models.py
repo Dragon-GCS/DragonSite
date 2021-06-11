@@ -9,11 +9,12 @@ MEDIA_ROOT = os.path.join(settings.MEDIA_ROOT,'netdisk')
 
 class File(models.Model):
     name = models.CharField('文件名',max_length=256)
-    owner = models.ForeignKey(User, on_delete=models.DO_NOTHING,null=True,default=None)
+    owner = models.ForeignKey(User, on_delete=models.CASCADE,null=True,default=None)
     dir = models.ForeignKey('Folder', on_delete=models.CASCADE, null=False)
-    digest = models.CharField(max_length=32)
+    digest = models.ForeignKey('Digest', on_delete=models.CASCADE, null=False)
     size = models.IntegerField(default=0)
     upload_time = models.DateField(auto_now_add=True)
+    is_image_file = ''
 
     def __str__(self):
         return self.get_url_path()
@@ -28,10 +29,10 @@ class File(models.Model):
         return '/'.join([self.dir.path, self.name])
 
     def get_cache_path(self):
-        return os.path.join(settings.CACHE_PATH, self.digest + settings.IMAGE_CACHE_TYPE)
+        return os.path.join(settings.CACHE_PATH, self.digest.digest + settings.IMAGE_CACHE_TYPE)
 
     def get_file_path(self):
-        return os.path.join(MEDIA_ROOT, self.digest)
+        return os.path.join(MEDIA_ROOT, self.digest.digest)
 
     def remove_file(self):
         os.remove(self.get_file_path())
@@ -56,7 +57,7 @@ class Folder(models.Model):
     name = models.CharField('文件夹名称', max_length=32)
     path = models.CharField('文件夹路径', max_length=2048)
     parent = models.ForeignKey('Folder',null=True,on_delete=models.CASCADE)
-    owner = models.ForeignKey(User, on_delete=models.DO_NOTHING, null=True, default=None)
+    owner = models.ForeignKey(User, on_delete=models.CASCADE, null=True, default=None)
     creat_time = models.DateField(auto_now_add=True)
 
     def __str__(self):
@@ -64,7 +65,7 @@ class Folder(models.Model):
 
     def show_name(self):
         if len(self.name) > 10:
-            return self.name[:10]
+            return self.name[:10] + "…"
         return self.name
 
     @classmethod
@@ -77,45 +78,37 @@ class Folder(models.Model):
         if not cls.objects.filter(path='public'):
             cls.objects.create(name='public', path='public', parent=None)
 
-    def remove(self):
-        for subdir in Folder.objects.filter(parent=self,owner=self.owner):
-            for file in subdir.file_set.all():
-                Link.minus_link(file)
-
-        for file in self.file_set.all():
-            Link.minus_link(file)
-
-        self.delete()
 
 
 
 
-class Link(models.Model):
+class Digest(models.Model):
     digest = models.CharField(max_length=32, primary_key=True)  # 记录文件的md5
-    links = models.IntegerField(default=0)
 
     def __str__(self):
-        return f"{self.digest}: {self.get_all_link()}"
+        return f"{self.digest}: {list(self.file_set.values_list('name'))}"
+
+    def get_md5_path(self):
+        return os.path.join(MEDIA_ROOT, self.digest)
+
+    def check_digest(self):
+        if not os.path.isfile(self.get_md5_path()):
+            self.delete()
+            print(f"digest'{self.digest}'无对应md5文件，已删除")
+        elif not self.file_set.all():
+            os.remove(self.get_md5_path())
+            self.delete()
+            print(f"digest'{self.digest}'无对应文件记录，已删除")
 
     @classmethod
-    def add_link(cls,file):
-        objs, created = cls.objects.get_or_create(digest=file.digest)
-        objs.links += 1
-        objs.save()
-
-    @classmethod
-    def minus_link(cls, file):
-        objs = cls.objects.get(digest=file.digest)
-        objs.links -= 1
-
-        if objs.links == 0:
-            file.remove_file()
-            objs.delete()
-        else:
-            objs.save()
-
-        file.delete()
-
-    def get_all_link(self):
-        list = [file.name for file in File.objects.filter(digest=self.digest)]
-        return list
+    def digest_repair(cls):
+        if not os.path.isdir(MEDIA_ROOT):
+            os.makedirs(MEDIA_ROOT)
+        # 用于清除没有对应记录的文件
+        for file in os.listdir(MEDIA_ROOT):
+            if not cls.objects.filter(digest=file):
+                print(f"文件'{file}'无对应digest记录，已删除")
+                os.remove(os.path.join(MEDIA_ROOT, file))
+        # 用于清除没有文件记录或没有对应文件的digest
+        for digest in cls.objects.all():
+            digest.check_digest()

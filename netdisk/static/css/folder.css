@@ -1,4 +1,5 @@
 input::-webkit-input-placeholder{color: #c5c5c5;}
+input[type=text]{text-align:center;}
 
 .folder-container{font-size:12pt;
     width:99%;height:90%;background:white;position:absolute;top:10%;right: 0;;overflow-y:auto;

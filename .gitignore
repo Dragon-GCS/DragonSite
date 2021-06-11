@@ -1,5 +1,8 @@
-__pycache/
+__pycache__/
 */__pycache__/
 */*/__pycache__/
 .idea/
 */migrations/*_*.py
+
+
+db.sqlite3

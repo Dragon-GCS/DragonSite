@@ -39,7 +39,7 @@
                     <div class="item-icon">
                         <img src="{% static 'image/folder.png' %}" alt="文件夹" width="100px" height="100px">
                     </div>
-                    <div class="name">{{ folder.show_name }}</div>
+                    <div class="item-name">{{ folder.show_name }}</div>
                 </a>
                 <div class="hidden-option">
                     <p class="del-url" style="display:none">{% url 'netdisk:delete' type="folder" path=folder.path %}</p >
@@ -78,7 +78,7 @@
                              <img src="{% static 'image/file.png' %}" alt="文件" width="100px" height="100px">
                          {% endif %}
                      </div>
-                     <div class="name">{{ file.show_name }}</div>
+                     <div class="item-name">{{ file.show_name }}</div>
                  </a>
 
                  <div class="hidden-option">
