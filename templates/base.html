@@ -14,7 +14,9 @@
         <div class="user-login">
             {% if request.user.is_authenticated %}
                 <p class="user-login">欢迎您，{{ request.user }}</p>
-                <a href="/admin">管理界面</a>
+                {% if request.user.is_superuser %}
+                    <a href="/admin">管理界面</a>
+                {% endif %}
                 <a href="/login/user_logout">退出登录</a>
             {% else %}
                 <a href="/login/user_login">请登录</a>

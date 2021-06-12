@@ -19,6 +19,10 @@ class File(models.Model):
     def __str__(self):
         return self.get_url_path()
 
+    def delete(self, using=None, keep_parents=False):
+        super().delete(using=None, keep_parents=False)
+        self.digest.check_digest()
+
     def show_name(self):
         filename, suffix = os.path.splitext(self.name)
         if len(filename) > 10:
@@ -92,13 +96,14 @@ class Digest(models.Model):
         return os.path.join(MEDIA_ROOT, self.digest)
 
     def check_digest(self):
+        digest = self.digest
         if not os.path.isfile(self.get_md5_path()):
             self.delete()
-            print(f"digest'{self.digest}'无对应md5文件，已删除")
+            print(f"digest:'{digest}'无对应md5文件，已删除")
         elif not self.file_set.all():
             os.remove(self.get_md5_path())
             self.delete()
-            print(f"digest'{self.digest}'无对应文件记录，已删除")
+            print(f"digest:'{digest}'无对应文件记录，已删除")
 
     @classmethod
     def digest_repair(cls):

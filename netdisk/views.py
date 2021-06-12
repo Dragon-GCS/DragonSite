@@ -125,13 +125,13 @@ def delete(request, type, path):
     if request.method == 'GET':
         if type =='folder':
             obj = Folder.objects.get(path=path,owner=request.user)
-            obj.remove()    # 删除文件夹及其所有子文件夹与文件
+            obj.delete()    # 删除文件夹及其所有子文件夹与文件
             message = "文件夹：{}删除成功".format(path)
         elif type == 'file':
             name = os.path.basename(path)
             dir = os.path.dirname(path)
             file = get_object_or_404(File, name=name,dir__path=dir ,owner=request.user)
-            file.digest.check_digest()    # 判断是否删除需要删除digest
+            file.delete()
             message = "文件：{} 删除成功".format(name)
         return render(request, 'pageJump.html', {'message':message})
 
