@@ -14,7 +14,6 @@ class File(models.Model):
     digest = models.ForeignKey('Digest', on_delete=models.CASCADE, null=False)
     size = models.IntegerField(default=0)
     upload_time = models.DateField(auto_now_add=True)
-    is_image_file = ''
 
     def __str__(self):
         return self.get_url_path()
@@ -97,9 +96,11 @@ class Digest(models.Model):
 
     def check_digest(self):
         digest = self.digest
+        # 文件不存在但库有记录，删除该条记录
         if not os.path.isfile(self.get_md5_path()):
             self.delete()
             print(f"digest:'{digest}'无对应md5文件，已删除")
+        # 文件存在且有记录，但没有关联的文件记录，删除文件和记录
         elif not self.file_set.all():
             os.remove(self.get_md5_path())
             self.delete()
@@ -109,7 +110,7 @@ class Digest(models.Model):
     def digest_repair(cls):
         if not os.path.isdir(MEDIA_ROOT):
             os.makedirs(MEDIA_ROOT)
-        # 用于清除没有对应记录的文件
+        # 用于清除数据库没有对应记录的文件
         for file in os.listdir(MEDIA_ROOT):
             if not cls.objects.filter(digest=file):
                 print(f"文件'{file}'无对应digest记录，已删除")

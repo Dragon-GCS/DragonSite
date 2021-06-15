@@ -24,7 +24,7 @@ def upload(request, path):
         files = request.FILES.getlist("files")
         parent = get_object_or_404(Folder, path=path, owner=request.user)
         handle_upload_files(files, parent, request.user)
-        return render(request, 'pageJump.html', {'message':'上传成功'})
+        # return render(request, 'pageJump.html', {'message':'上传成功'})
 
 
 @login_required

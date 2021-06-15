@@ -6,6 +6,15 @@ input[type=text]{text-align:center;}
     display:flex;flex-direction: row;flex-wrap: wrap;align-content: flex-start;
 }
 
+#disk-menu{
+    display: flex;align-items: center;
+}
+
+#progress{display: none;align-items: center;margin-left:10px;}
+#progress-total{height:20px;width:100px;border:2px solid gray;float:left;margin-right:10px;}
+#progress-finish{height:100%;width:0;background:gray;}
+#progress-rate{margin-right:20px}
+
 .folder-menu{
     width: 100%;display: flex;justify-content: space-between;font-size:18pt;
 }
@@ -28,8 +37,8 @@ input[type=text]{text-align:center;}
 .folder-detail :hover{text-decoration:none}
 
 #folder_input{
-    width:20%;height:20%;float:left;display:flex;flex-direction:column;align-items:center;text-align:center;
-    display:none
+    width:20%;height:20%;float:left;flex-direction:column;align-items:center;text-align:center;display:none;
+
 }
 
 .hidden-option{

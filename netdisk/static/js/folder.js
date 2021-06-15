@@ -30,18 +30,21 @@ $(function(){
     $("#upload").click(function(){
         $("#file_upload").click();
     })
-     $("#file_upload").change(function(){
-         var submit = true;
-         var files = document.getElementById("file_upload").files;
-         for(i=0,len=files.length;i<len;i++){
-             var name = files[i].name
-                 if(space_detect(name)){
-                 alert(name+" 文件名中包含空格，无法提交。");
-                 return false
-                 }
-            }
-         $("#upload_form").submit();
+    $("#file_upload").change(function(){
+        $('#progress').show()
+        var files = $("#file_upload")[0].files;
+        for(i=0,len=files.length;i<len;i++){
+            files[i].name = files[i].name.replace(/\s+/g, '#')
+        }
+        var form = new FormData(document.getElementById('upload_form'))
+        var xhr = new XMLHttpRequest();
+        var url = $("#upload_form").attr("action")
+        xhr.upload.addEventListener('progress',on_progress,false);
+        xhr.open('POST',url,true);
+        xhr.setRequestHeader('X-CSRFTOKEN',$("[name='csrfmiddlewaretoken']")[0].value);
+        xhr.send(form);
      })
+
     // 文件与文件夹选项
     $('.folder-detail').mouseover(function(){
         $(this).find(".hidden-option").show();
@@ -121,4 +124,14 @@ function get_prefix(filename) {
         prefix = filename.substring(0, filename.lastIndexOf("."));
     }
     return prefix
+}
+
+function on_progress(evt) {
+    if(evt.lengthComputable) {
+        var ele = document.getElementById('progress-finish');
+        var percent = Math.round((evt.loaded) * 100 / evt.total);
+        ele.style.width = percent + '%';
+        document.getElementById('progress-rate').innerHTML = percent + '%';
+        if(percent === 100){location.reload()}
+    }
 }

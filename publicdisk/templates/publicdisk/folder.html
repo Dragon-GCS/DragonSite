@@ -11,11 +11,15 @@
 
 {% block content-core %}
     <div class="folder-menu">
-        <div>
+        <div id="disk-menu">
             <button id="back-button" class="folder-button">返回上一级</button>
             <span id="goback" style="display:none">{% url "publicdisk:prev_folder" %}</span>
             <button id="create" class="folder-button">新建文件夹</button>
             <button id="upload" class="folder-button">上传文件</button>
+            <div id="progress">
+                <div id='progress-total'><div id='progress-finish'></div></div>
+                <b id='progress-rate'>0%</b>
+            </div>
         </div>
         <div id="path-nav">
             当前目录:
