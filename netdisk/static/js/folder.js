@@ -43,7 +43,7 @@ $(function(){
          $("#upload_form").submit();
      })
     // 文件与文件夹选项
-    $('.folder-detail').onmouseover(function(){
+    $('.folder-detail').mouseover(function(){
         $(this).find(".hidden-option").show();
     });
     $(".folder-detail").mouseleave(function(){
