@@ -79,7 +79,7 @@
                  <a class="name" href= "{% url 'netdisk:download' path=file.get_url_path%}">
                      <div class="item-icon">
                          {% if file.is_image %}
-                             <img class="item-icon"src="{% url 'netdisk:preview' path=file.get_url_path%}"  alt="图片">
+                             <img class="item-icon" src={{ file.is_image }}  alt="图片">
                          {% else %}
                              <img src="{% static 'image/file.png' %}" alt="文件" width="100px" height="100px">
                          {% endif %}
