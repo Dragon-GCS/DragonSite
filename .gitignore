@@ -2,6 +2,7 @@ __pycache__/
 */__pycache__/
 */*/__pycache__/
 .idea/
+media/
 */migrations/*_*.py
 
 

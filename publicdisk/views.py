@@ -3,7 +3,7 @@ import os,mimetypes
 
 from PIL import Image
 
-from django.http import FileResponse
+from django.http import FileResponse,HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404, reverse
 
 from netdisk.models import File, Folder
@@ -39,9 +39,10 @@ def download(request, path):
             response["Content-Encoding"] = encoding
         return response
 
-
+'''
 def preview(request,path):
-    if request.method == 'GET':
+    print(request.method)
+    if request.method == 'POST':
         name = os.path.basename(path)
         dir = os.path.dirname(path)
         file = get_object_or_404(File, name=name, dir__path=dir, owner=None)
@@ -53,9 +54,9 @@ def preview(request,path):
             image = Image.open(file.get_file_path())
             image = image.resize((150, 150))
             image.save(cache_path)
-
-        return FileResponse(open(cache_path, 'rb'))
-
+            return FileResponse(open(cache_path, 'rb'))
+        return HttpResponse(p)
+'''
 
 def folder_show(request, path):
     if request.method == 'GET':
@@ -88,7 +89,7 @@ def create(request,path):
 
 def rename(request, type, path):
     if request.method == 'POST':
-        new_name = remove_blank(request.POST.get("folder_name"))
+        new_name = remove_blank(request.POST.get("new_name"))
         if type == 'folder':
             obj = Folder.objects.get(path=path,owner=None)
             folder_list = Folder.objects.filter(parent=obj.parent,owner=None)
@@ -115,7 +116,7 @@ def rename(request, type, path):
 
 
 def delete(request, type, path):
-    if request.method == 'GET':
+    if request.method == 'POST':
         if type =='folder':
             obj = Folder.objects.get(path=path,owner=None)
             obj.delete()    # 删除文件夹及其所有子文件夹与文件

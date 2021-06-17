@@ -4,6 +4,7 @@ import os
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.db import models
+from PIL import Image
 
 MEDIA_ROOT = os.path.join(settings.MEDIA_ROOT,'netdisk')
 
@@ -41,7 +42,17 @@ class File(models.Model):
         os.remove(self.get_file_path())
 
     def is_image(self):
-        return filetype.image_match(self.get_file_path())
+        if filetype.image_match(self.get_file_path()):
+            cache_path = self.get_cache_path()
+            if not os.path.isdir(os.path.dirname(cache_path)):
+                os.makedirs(os.path.dirname(cache_path))
+            if not os.path.isfile(cache_path):
+                image = Image.open(self.get_file_path())
+                image = image.resize((150, 150))
+                image.save(cache_path)
+            return os.path.join('\media', 'cache', os.path.basename(cache_path))
+        return None
+
 
     def get_file_size(self):
         size = self.size

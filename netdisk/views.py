@@ -43,7 +43,7 @@ def download(request, path):
             response["Content-Encoding"] = encoding
         return response
 
-
+'''
 @login_required
 def preview(request,path):
     if request.method == 'GET':
@@ -60,7 +60,7 @@ def preview(request,path):
             image.save(cache_path)
 
         return FileResponse(open(cache_path,'rb'))
-
+'''
 
 @login_required
 def folder_show(request, path):
@@ -122,7 +122,7 @@ def rename(request, type, path):
 
 @login_required
 def delete(request, type, path):
-    if request.method == 'GET':
+    if request.method == 'POST':
         if type =='folder':
             obj = Folder.objects.get(path=path,owner=request.user)
             obj.delete()    # 删除文件夹及其所有子文件夹与文件

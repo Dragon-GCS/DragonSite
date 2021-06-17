@@ -46,7 +46,7 @@ $(function(){
      })
 
     // 文件与文件夹选项
-    $('.folder-detail').mouseover(function(){
+    $('.folder-detail').mouseenter(function(){
         $(this).find(".hidden-option").show();
     });
     $(".folder-detail").mouseleave(function(){
@@ -65,7 +65,6 @@ $(function(){
     $(".rename-form :submit").click(function () {
         var new_name = $(this).siblings("input[name='new_name']").val()
         var name = $(this).parent().siblings("a.name").children(".item-name").text()
-        console.log(name)
         if(space_detect(new_name)){
             alert("名称中不能含有空格");
             return false;
@@ -89,15 +88,20 @@ $(function(){
     $(".del-button").click(function(){
     var url = $(this).siblings(".del-url").text();
     if (confirm("确定要删除吗？")){
-        location.href = url;
+        var form = new FormData()
+        var xhr = new XMLHttpRequest();
+        xhr.open('POST',url,true);
+        xhr.setRequestHeader('X-CSRFTOKEN',$("[name='csrfmiddlewaretoken']")[0].value);
+        xhr.send(form);
         }
+    location.reload()
     })
-    /* 可以从服务器读取字节流
+    /*可以从服务器读取字节流
     $(function () {
         var img = $(".image-icon")
         var url = img.attr('src')
         var xmlhttp = new XMLHttpRequest()
-            xmlhttp.open("GET",url,true);
+            xmlhttp.open("POST",url,true);
             xmlhttp.responseType = "blob";
             xmlhttp.onload = function(){
                 if (this.status == 200) {
@@ -132,6 +136,6 @@ function on_progress(evt) {
         var percent = Math.round((evt.loaded) * 100 / evt.total);
         ele.style.width = percent + '%';
         document.getElementById('progress-rate').innerHTML = percent + '%';
-        if(percent === 100){location.reload()}
+        if(percent === 100){location.reload()};
     }
 }
