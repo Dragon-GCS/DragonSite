@@ -1,9 +1,7 @@
 # Create your views here.
-import os,mimetypes
+import os,filetype
 
-from PIL import Image
-
-from django.http import FileResponse,HttpResponse
+from django.http import FileResponse
 from django.shortcuts import render, redirect, get_object_or_404, reverse
 
 from netdisk.models import File, Folder
@@ -21,7 +19,7 @@ def upload(request, path):
         files = request.FILES.getlist("files")
         parent = get_object_or_404(Folder, path=path, owner=None)
         handle_upload_files(files, parent)
-        # return render(request, 'pageJump.html', {'message':'上传成功'})
+        return render(request, 'pageJump.html', {'message':'上传成功'})
 
 
 def download(request, path):
@@ -29,34 +27,24 @@ def download(request, path):
         name = os.path.basename(path)
         dir = os.path.dirname(path)
         file = get_object_or_404(File, name=name, dir__path=dir, owner=None)
-        content_type, encoding = mimetypes.guess_type(str(file.get_file_path()))
-        content_type = content_type or 'application/octet-stream'
+        #file_type = filetype.guess(str(file.get_file_path()))
+        #if file_type:
+        #    content_type = file_type.mime
+        #else:
+        #    content_type = 'application/octet-stream'
+        #response['Content-Type'] = content_type
         response = FileResponse(open(file.get_file_path(), 'rb'))
         response["Content-Length"] = file.size
-        response['Content-Type'] = content_type
         response['Content-Disposition'] = f'attachment;filename="{name}"'
-        if encoding:
-            response["Content-Encoding"] = encoding
         return response
 
-'''
-def preview(request,path):
-    print(request.method)
-    if request.method == 'POST':
+def preview(request, path):
+    if request.method == 'GET':
         name = os.path.basename(path)
         dir = os.path.dirname(path)
         file = get_object_or_404(File, name=name, dir__path=dir, owner=None)
-        cache_path = file.get_cache_path()
+        return render(request, 'preview.html', context={'file':file})
 
-        check_path_exits(os.path.dirname(cache_path))
-
-        if not os.path.isfile(cache_path):
-            image = Image.open(file.get_file_path())
-            image = image.resize((150, 150))
-            image.save(cache_path)
-            return FileResponse(open(cache_path, 'rb'))
-        return HttpResponse(p)
-'''
 
 def folder_show(request, path):
     if request.method == 'GET':

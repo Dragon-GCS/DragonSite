@@ -1,14 +1,13 @@
 # Create your views here.
-import os,mimetypes
+import os,filetype
 
-from PIL import Image
 
 from django.contrib.auth.decorators import login_required
 from django.http import FileResponse
 from django.shortcuts import render, redirect, get_object_or_404, reverse
 
 from .models import File, Folder
-from .utils import handle_upload_files, get_unique_folder_name, path_to_link, check_path_exits, remove_blank
+from .utils import handle_upload_files, get_unique_folder_name, path_to_link, remove_blank
 
 
 @login_required
@@ -24,7 +23,7 @@ def upload(request, path):
         files = request.FILES.getlist("files")
         parent = get_object_or_404(Folder, path=path, owner=request.user)
         handle_upload_files(files, parent, request.user)
-        # return render(request, 'pageJump.html', {'message':'上传成功'})
+        return render(request, 'pageJump.html', {'message':'上传成功'})
 
 
 @login_required
@@ -33,34 +32,23 @@ def download(request, path):
         name = os.path.basename(path)
         dir = os.path.dirname(path)
         file = get_object_or_404(File, name=name, dir__path=dir,owner=request.user)
-        content_type, encoding = mimetypes.guess_type(str(file.get_file_path()))
-        content_type = content_type or 'application/octet-stream'
+        # file_type = filetype.guess(str(file.get_file_path()))
+        # if file_type:
+        #     content_type = file_type.mime
+        # else:
+        #     content_type = 'application/octet-stream'
+        #response['Content-Type'] = content_type
         response = FileResponse(open(file.get_file_path(), 'rb'))
         response["Content-Length"] = file.size
-        response['Content-Type'] = content_type
         response['Content-Disposition'] = f'attachment;filename="{name}"'
-        if encoding:
-            response["Content-Encoding"] = encoding
         return response
-
-'''
 @login_required
-def preview(request,path):
+def preview(request, path):
     if request.method == 'GET':
         name = os.path.basename(path)
         dir = os.path.dirname(path)
         file = get_object_or_404(File, name=name, dir__path=dir, owner=request.user)
-        cache_path = file.get_cache_path()
-
-        check_path_exits(os.path.dirname(cache_path))
-
-        if not os.path.isfile(cache_path):
-            image = Image.open(file.get_file_path())
-            image = image.resize((150,150))
-            image.save(cache_path)
-
-        return FileResponse(open(cache_path,'rb'))
-'''
+        return render(request, 'preview.html', context={'file':file})
 
 @login_required
 def folder_show(request, path):

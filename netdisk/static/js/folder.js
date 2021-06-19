@@ -96,6 +96,7 @@ $(function(){
         }
     location.reload()
     })
+    //图片视频预览
     /*可以从服务器读取字节流
     $(function () {
         var img = $(".image-icon")

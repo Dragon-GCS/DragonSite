@@ -41,8 +41,15 @@ class File(models.Model):
     def remove_file(self):
         os.remove(self.get_file_path())
 
+    def file_type(self):
+        file_type = filetype.guess(self.get_file_path())
+        if file_type:
+            mime = file_type.mime
+            return mime.split('/')[0]
+        return None
+
     def is_image(self):
-        if filetype.image_match(self.get_file_path()):
+        if self.file_type() == 'image':
             cache_path = self.get_cache_path()
             if not os.path.isdir(os.path.dirname(cache_path)):
                 os.makedirs(os.path.dirname(cache_path))

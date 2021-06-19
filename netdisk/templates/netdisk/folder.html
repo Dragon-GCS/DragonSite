@@ -20,8 +20,6 @@
                 <div id='progress-total'><div id='progress-finish'></div></div>
                 <b id='progress-rate'>0%</b>
             </div>
-
-
         </div>
         <div id="path-nav">
             当前目录:
@@ -88,17 +86,18 @@
                  </a>
 
                  <div class="hidden-option">
-                    <p class="del-url" style="display:none">{% url 'netdisk:delete' type="file" path=file.get_url_path %}</p >
-                    <button class="rename-button">重命名</button>
-                    <button class="del-button">删除</button>
+                     <p class="del-url" style="display:none">{% url 'netdisk:delete' type="file" path=file.get_url_path %}</p >
+                     <button class="rename-button">重命名</button>
+                     <button class="del-button">删除</button>
+                     <button class="preview-button"><a href="{% url 'netdisk:preview' path=file.get_url_path %}" style="color: black">预览</a></button>
                  </div>
                 <!--重命名表单-->
                  <form action="{% url 'netdisk:rename' type="file" path=file.get_url_path %}" method="POST" enctype="multipart/form-data" class="rename-form" style="display:none">
-                    {% csrf_token %}
-                    <input type="text" name="new_name" placeholder="重命名" autocomplete="off">
-                    <p></p >
-                    <input type="submit" class="folder-button" value="确定">
-                    <input type="button" class="folder-button" value="取消">
+                     {% csrf_token %}
+                     <input type="text" name="new_name" placeholder="重命名" autocomplete="off">
+                     <p></p >
+                     <input type="submit" class="folder-button" value="确定">
+                     <input type="button" class="folder-button" value="取消">
                  </form>
              </div>
         {% endfor %}
